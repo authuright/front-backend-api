@@ -1,0 +1,49 @@
+version: "3"
+name: fullstack-school-system
+services:
+  flask:
+    container_name: api-server
+    restart: always
+    build:
+      context: .
+      dockerfile: services/servers/Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=postgresql://authuright:authuright@postgres:5432/fullstackdb
+    networks:
+      - fullstack-network
+    volumes:
+      - ./api:/api
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: fullstackdb
+      POSTGRES_USER: authuright
+      POSTGRES_PASSWORD: authuright
+    ports:
+      - "5432:5432"
+    networks:
+      - fullstack-network
+
+  vue:
+    container_name: vue-server
+    restart: always
+    build:
+      context: .
+      dockerfile: services/clients/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./frontend:/frontend
+    stdin_open: true
+
+networks:
+  fullstack-network:
+    driver: bridge
+
